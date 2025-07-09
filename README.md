@@ -4,9 +4,10 @@ A simple, production-ready Flask web application containerized with Docker and b
 
 ---
 
-## 📸 Preview
+## 📷 App Screenshot
 
-> "🚀 Hello from Dockerized Flask App on Google IDX!"
+![Flask App Screenshot](./screenshot.png)
+
 
 ---
 
