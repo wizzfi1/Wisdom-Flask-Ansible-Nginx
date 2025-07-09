@@ -6,7 +6,7 @@ A simple, production-ready Flask web application containerized with Docker and b
 
 ## 📷 App Screenshot
 
-![Flask App Screenshot](./screenshot.png)
+![Flask App Screenshot](./screenshot.PNG)
 
 
 ---
