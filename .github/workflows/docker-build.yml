@@ -26,4 +26,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: wizfi/Wisdom-Flask:latest
+          tags: wizfi/wisdom-flask:latest
