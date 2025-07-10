@@ -54,6 +54,12 @@ Pulls the latest Docker image from Docker Hub
 
 Stops and replaces the running container
 
+
+## 📸 Screenshot
+
+![Flask App Screenshot](./screenshot.PNG)
+
+
 ## 🧱 Project Structure
 
 ```text
@@ -68,7 +74,15 @@ wisdom-flask/
         └── deploy-to-ec2.yml
 
 
+💡 DevOps Stack Used
 
-📸 Screenshot
+| Category         | Tool               |
+| ---------------- | ------------------ |
+| Language         | Python (Flask)     |
+| Containerization | Docker             |
+| CI/CD            | GitHub Actions     |
+| Cloud Hosting    | AWS EC2 (Ubuntu)   |
+| Deployment       | Docker Run via SSH |
 
-![Flask App Screenshot](./screenshot.PNG)
+
+⭐ Don't forget to star the repo if this helped you!
