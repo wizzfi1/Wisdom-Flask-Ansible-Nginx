@@ -66,6 +66,7 @@ wisdom-flask/
     └── workflows/
         └── deploy-to-ec2.yml
 
+
 📸 Screenshot
 
 ![Flask App Screenshot](./screenshot.PNG)
