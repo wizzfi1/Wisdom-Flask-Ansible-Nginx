@@ -1,27 +1,37 @@
-# 🧠 Wisdom Flask App 🚀
+# 🧠 Wisdom Flask · GitHub → Docker Hub → AWS EC2 🚀
 
 A lightweight Flask web application containerized with Docker, auto-built via GitHub Actions, and deployed to an AWS EC2 instance through secure SSH-based CI/CD.
 
 ---
 
-## 🌍 Live Demo
+This project demonstrates a complete DevOps deployment pipeline:
 
-> 🚀 View it live at:  
-**http://51.21.196.52:5000**
+- ✅ Python Flask web application
+- ✅ Dockerized with a lightweight, production-ready image
+- ✅ GitHub Actions workflow that automates deployment
+- ✅ Secure SSH-based delivery to AWS EC2 on every push
+- ✅ Publicly accessible at: http://51.21.196.52:5000
 
+> 🛠️ CI/CD without clickops. Just code → deploy.
+
+---
+
+### 🔗 Live Project Links
+
+- 🧠 **Live App**: http://51.21.196.52:5000  
+- 📦 **Docker Image**: [Docker Hub Repo](https://hub.docker.com/r/<yourdockerhub>/wisdom-flask)  
+- 🧰 **Deployed via**: [GitHub Actions Workflow](.github/workflows/deploy-to-ec2.yml)
 
 ---
 
-## 📦 Features
+### 💡 What This Proves
 
-- ✅ Python Flask web app
-- ✅ Dockerized using `python:3.9-slim`
-- ✅ CI/CD with GitHub Actions
-- ✅ Auto-deployment to AWS EC2 over SSH
-- ✅ Public URL using EC2 Security Group + port 5000
-- ✅ Clean repo with Docker + GitHub workflows
+- You understand CI/CD workflows **beyond tutorials**
+- You can securely automate production-like infrastructure
+- You’re capable of cloud deployment with industry tools
 
 ---
+
 
 ## 🐳 Run Locally
 
