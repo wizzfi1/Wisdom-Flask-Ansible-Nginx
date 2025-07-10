@@ -1,3 +1,3 @@
-__pycache__/
+git push origin main --force__pycache__/
 *.pyc
 .env
