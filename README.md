@@ -54,8 +54,9 @@ Pulls the latest Docker image from Docker Hub
 
 Stops and replaces the running container
 
-🧱 Project Structure
+## 🧱 Project Structure
 
+```text
 wisdom-flask/
 ├── app.py
 ├── Dockerfile
@@ -65,6 +66,7 @@ wisdom-flask/
 └── .github/
     └── workflows/
         └── deploy-to-ec2.yml
+
 
 
 📸 Screenshot
