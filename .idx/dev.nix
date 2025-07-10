@@ -14,6 +14,8 @@
      pkgs.docker 
      pkgs.docker-client
      pkgs.openssh
+     pkgs.tenv
+     pkgs.ansible
      ];
 
   # Sets environment variables in the workspace

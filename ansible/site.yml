@@ -1,0 +1,26 @@
+- name: Deploy Dockerized Flask app
+  hosts: ec2
+  become: true
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Run Flask container
+      docker_container:
+        name: wisdom
+        image: wizfi/wisdom-flask
+        state: started
+        ports:
+          - "5000:5000"
