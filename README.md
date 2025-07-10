@@ -1,79 +1,71 @@
 # 🧠 Wisdom Flask App 🚀
 
-A simple, production-ready Flask web application containerized with Docker and built via GitHub Actions CI/CD. Perfect as a DevOps portfolio project.
+A lightweight Flask web application containerized with Docker, auto-built via GitHub Actions, and deployed to an AWS EC2 instance through secure SSH-based CI/CD.
 
 ---
 
-## 📷 App Screenshot
+## 🌍 Live Demo
 
-![Flask App Screenshot](./screenshot.PNG)
+> 🚀 View it live at:  
+**http://51.21.196.52:5000**
 
 
 ---
 
 ## 📦 Features
 
-- ✅ Python Flask web application
-- ✅ Dockerized using lightweight Python base image
-- ✅ Automated Docker builds with GitHub Actions
-- ✅ Image hosted on Docker Hub
-- ✅ Easily deployable to AWS EC2, GCP VM, or any Linux server
+- ✅ Python Flask web app
+- ✅ Dockerized using `python:3.9-slim`
+- ✅ CI/CD with GitHub Actions
+- ✅ Auto-deployment to AWS EC2 over SSH
+- ✅ Public URL using EC2 Security Group + port 5000
+- ✅ Clean repo with Docker + GitHub workflows
 
 ---
 
-## 🐳 Docker
+## 🐳 Run Locally
 
-### 🔧 Build Locally
+### Clone the repo:
 
-```bash
+git clone https://github.com/wizzfi1/wisdom-flask.git
+cd wisdom-flask
+
+Build and run:
+
 docker build -t wisdom-flask .
-
-
-🚀 Run Locally
-
 docker run -p 5000:5000 wisdom-flask
-Then visit: http://localhost:5000
+Then open http://localhost:5000
 
-🔁 GitHub Actions CI/CD
+🔁 CI/CD: GitHub Actions → AWS EC2
+This project uses GitHub Actions to deploy automatically to an EC2 instance on every push to main.
 
-This project uses GitHub Actions to:
+🔐 Secrets Used:
+EC2_HOST → your EC2 public IP
 
-Build the Docker image on every push to main
+EC2_SSH_KEY → your private SSH key (added via GitHub Secrets)
 
-Push the latest image to Docker Hub
+💻 Workflow File:
 
-📁 GitHub Actions Workflow:
+.github/workflows/deploy-to-ec2.yml
+What it does:
+Connects to EC2 using SSH
 
-.github/workflows/docker-build.yml
-🐋 Docker Hub
-👉 Docker Image:
-https://hub.docker.com/r/yourdockerhubusername/wisdom-flask
+Pulls the latest Docker image from Docker Hub
 
-You can pull and run it with:
+Stops and replaces the running container
 
-
-docker pull yourdockerhubusername/wisdom-flask
-docker run -p 5000:5000 yourdockerhubusername/wisdom-flask
-
-🌐 Deployment (Coming in Week 2)
-This app will be deployed to:
-
- AWS EC2 (manual setup)
-
- AWS EC2 via Terraform + Ansible
-
- Kubernetes (optional)
-
-Stay tuned for updates in the deploy/ folder!
-
-📁 File Structure
+🧱 Project Structure
 
 wisdom-flask/
 ├── app.py
-├── requirements.txt
 ├── Dockerfile
-├── .dockerignore
+├── requirements.txt
 ├── README.md
+├── .dockerignore
 └── .github/
     └── workflows/
-        └── docker-build.yml
+        └── deploy-to-ec2.yml
+
+📸 Screenshot
+
+![Flask App Screenshot](./screenshot.PNG)
