@@ -13,6 +13,7 @@
      pkgs.nodePackages.nodemon
      pkgs.docker 
      pkgs.docker-client
+     pkgs.openssh
      ];
 
   # Sets environment variables in the workspace
