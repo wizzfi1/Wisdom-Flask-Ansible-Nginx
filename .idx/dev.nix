@@ -16,6 +16,7 @@
      pkgs.openssh
      pkgs.tenv
      pkgs.ansible
+     pkgs.awscli
      ];
 
   # Sets environment variables in the workspace
