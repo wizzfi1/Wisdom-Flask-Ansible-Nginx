@@ -1,5 +1,12 @@
 # 🚀 Wisdom Flask Ansible
 
+![Terraform](https://img.shields.io/badge/Terraform-IaC-blueviolet?logo=terraform)
+![Ansible](https://img.shields.io/badge/Ansible-Automation-red?logo=ansible)
+![Docker](https://img.shields.io/badge/Docker-Container-blue?logo=docker)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-blue?logo=githubactions)
+![AWS](https://img.shields.io/badge/AWS-EC2-orange?logo=amazonaws)
+
+
 A fully automated Flask application deployment pipeline built with **Terraform**, **Ansible**, **Docker**, and **GitHub Actions**.
 
 This project provisions AWS infrastructure, configures EC2, and deploys a Dockerized Flask app — all triggered by a single `git push`.
