@@ -78,7 +78,7 @@ jobs:
       - name: Create Dynamic Inventory
         run: |
             echo "[ec2]" > ansible/inventory.ini
-            echo "${{ steps.ec2ip.outputs.ip }} ansible_user=${{ secrets.EC2_SSH_USER }} ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
+            echo "${{ steps.ec2ip.outputs.ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
