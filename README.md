@@ -1,98 +1,122 @@
-# 🧠 Wisdom Flask · GitHub → Docker Hub → AWS EC2 🚀
+# 🚀 Wisdom Flask Ansible
 
-A lightweight Flask web application containerized with Docker, auto-built via GitHub Actions, and deployed to an AWS EC2 instance through secure SSH-based CI/CD.
+A fully automated Flask application deployment pipeline built with **Terraform**, **Ansible**, **Docker**, and **GitHub Actions**.
 
----
-
-This project demonstrates a complete DevOps deployment pipeline:
-
-- ✅ Python Flask web application
-- ✅ Dockerized with a lightweight, production-ready image
-- ✅ GitHub Actions workflow that automates deployment
-- ✅ Secure SSH-based delivery to AWS EC2 on every push
-- ✅ Publicly accessible at: http://51.21.196.52:5000
-
-> 🛠️ CI/CD without clickops. Just code → deploy.
+This project provisions AWS infrastructure, configures EC2, and deploys a Dockerized Flask app — all triggered by a single `git push`.
 
 ---
 
-### 🔗 Live Project Links
+## 📦 Tech Stack
 
-- 🧠 **Live App**: http://51.21.196.52:5000  
-- 📦 **Docker Image**: [Docker Hub Repo](https://hub.docker.com/r/<yourdockerhub>/wisdom-flask)  
-- 🧰 **Deployed via**: [GitHub Actions Workflow](.github/workflows/deploy-to-ec2.yml)
-
----
-
-### 💡 What This Proves
-
-- You understand CI/CD workflows **beyond tutorials**
-- You can securely automate production-like infrastructure
-- You’re capable of cloud deployment with industry tools
+- **AWS EC2** – compute environment for app hosting  
+- **Terraform** – infrastructure provisioning (IaaC)  
+- **Ansible** – remote configuration and Docker deployment  
+- **Docker** – containerized Flask application  
+- **GitHub Actions** – CI/CD automation  
+- **Docker Hub** – image storage & delivery  
 
 ---
 
-
-## 🐳 Run Locally
-
-### Clone the repo:
-
-git clone https://github.com/wizzfi1/wisdom-flask.git
-cd wisdom-flask
-
-Build and run:
-
-docker build -t wisdom-flask .
-docker run -p 5000:5000 wisdom-flask
-Then open http://localhost:5000
-
-🔁 CI/CD: GitHub Actions → AWS EC2
-This project uses GitHub Actions to deploy automatically to an EC2 instance on every push to main.
-
-🔐 Secrets Used:
-EC2_HOST → your EC2 public IP
-
-EC2_SSH_KEY → your private SSH key (added via GitHub Secrets)
-
-💻 Workflow File:
-
-.github/workflows/deploy-to-ec2.yml
-What it does:
-Connects to EC2 using SSH
-
-Pulls the latest Docker image from Docker Hub
-
-Stops and replaces the running container
-
-
-## 📸 Screenshot
-
-![Flask App Screenshot](./screenshot.PNG)
-
-
-## 🧱 Project Structure
+## 🧱 Architecture
 
 ```text
-wisdom-flask/
-├── app.py
-├── Dockerfile
-├── requirements.txt
-├── README.md
-├── .dockerignore
-└── .github/
-    └── workflows/
-        └── deploy-to-ec2.yml
+┌──────────────┐       ┌──────────────┐       ┌────────────────────┐
+│  GitHub Repo │ ───▶  │ GitHub Actions │ ───▶ │ Terraform (infra/) │
+└──────────────┘       └──────────────┘       └────────┬──────────┘
+                                                       ▼
+                                               ┌──────────────┐
+                                               │   AWS EC2    │
+                                               │ Ubuntu + SG  │
+                                               └──────┬───────┘
+                                                      ▼
+                                               ┌──────────────┐
+                                               │  Ansible CI  │
+                                               │ Installs Docker
+                                               │ Runs Flask App │
+                                               └──────┬───────┘
+                                                      ▼
+                                               ┌──────────────┐
+                                               │ Docker Hub   │
+                                               │ wizfi/wisdom │
+                                               └──────────────┘
 
 
-💡 DevOps Stack Used
+📁 Folder Structure
 
-| Category         | Tool               |
-| ---------------- | ------------------ |
-| Language         | Python (Flask)     |
-| Containerization | Docker             |
-| CI/CD            | GitHub Actions     |
-| Cloud Hosting    | AWS EC2 (Ubuntu)   |
-| Deployment       | Docker Run via SSH |
+Wisdom-Flask-Ansible/
+├── ansible/
+│   ├── site.yml              # Ansible playbook
+│   └── inventory.ini         # Dynamic inventory from GitHub Action
+├── infra/
+│   ├── main.tf               # Terraform AWS EC2 & keypair setup
+│   ├── github-deploy.pub     # Public key used for SSH
+├── .github/
+│   └── workflows/
+│       └── deploy.yml        # GitHub Actions CI/CD workflow
+├── .gitignore
+├── README.md                 # You're here!
 
 
-⭐ Don't forget to star the repo if this helped you!
+💡 How It Works
+-Push to main branch
+
+-GitHub Actions runs deploy.yml
+
+-Terraform provisions:
+
+EC2 instance
+
+Security group (ports 22, 5000)
+
+Injects SSH key
+
+Action extracts EC2 public IP
+
+-Ansible connects via SSH:
+
+Installs Docker
+
+Pulls Flask image from Docker Hub
+
+Runs container on port 5000
+
+🌍 Live App
+
+🔗 http://52.55.169.248:5000
+
+🧪 Local Testing (Optional)
+You can test everything locally before pushing:
+
+# Infra
+cd infra
+terraform init
+terraform apply
+
+# Deploy
+cd ansible
+ansible-playbook -i inventory.ini site.yml
+
+🔐 GitHub Secrets Required
+
+| Secret Name             | Description                                   |
+| ----------------------- | --------------------------------------------- |
+| `AWS_ACCESS_KEY_ID`     | IAM access key for AWS                        |
+| `AWS_SECRET_ACCESS_KEY` | IAM secret key for AWS                        |
+| `SSH_PRIVATE_KEY`       | EC2 private key (from `~/.ssh/github-deploy`) |
+| `EC2_SSH_USER`          | Typically `ubuntu`                            |
+| `DOCKERHUB_USERNAME`    | Docker Hub login                              |
+| `DOCKERHUB_TOKEN`       | Docker Hub access token                       |
+
+
+## 🏁 Next Steps (Planned)
+
+- [ ] Add **NGINX** reverse proxy  
+- [ ] Enable **HTTPS** with Let's Encrypt  
+- [ ] Connect **custom domain**  
+- [ ] Add monitoring with **Prometheus + Grafana**  
+- [ ] Move to **Kubernetes / ECS**
+
+
+🙌 Contributions
+This project is a learning showcase — contributions and forks are welcome!
+Feel free to star 🌟 the repo if you found it helpful.
