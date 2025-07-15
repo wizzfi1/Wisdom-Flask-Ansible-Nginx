@@ -1,0 +1,48 @@
+---
+- name: Update apt and install required packages
+  apt:
+    update_cache: yes
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - docker.io
+    state: present
+
+- name: Ensure Docker is running and enabled
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add user to Docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+
+- name: Pull latest Docker image
+  docker_image:
+    name: "{{ docker_image }}"
+    source: pull
+    force_source: yes
+
+- name: Remove any existing container
+  docker_container:
+    name: "{{ container_name }}"
+    state: absent
+    force_kill: true
+
+- name: Run the Flask container
+  docker_container:
+    name: "{{ container_name }}"
+    image: "{{ docker_image }}"
+    state: started
+    restart_policy: "{{ docker_restart_policy }}"
+    ports:
+      - "{{ container_port }}:{{ container_port }}"
+    env:
+      FLASK_ENV: production
+    volumes:
+      - "/var/log/wisdom:/app/logs"
