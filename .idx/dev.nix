@@ -16,7 +16,9 @@
      pkgs.openssh
      pkgs.tenv
      pkgs.ansible
+     pkgs.sudo
      pkgs.awscli
+     pkgs.busybox
      ];
 
   # Sets environment variables in the workspace

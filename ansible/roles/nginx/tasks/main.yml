@@ -1,25 +1,28 @@
 ---
-- name: Install NGINX
+- name: Install Nginx
   apt:
     name: nginx
     state: present
     update_cache: yes
 
-- name: Ensure NGINX is running
-  systemd:
-    name: nginx
-    state: started
-    enabled: yes
-
-- name: Copy NGINX reverse proxy config
+- name: Copy Nginx configuration
   template:
     src: nginx.conf.j2
     dest: /etc/nginx/sites-available/default
-    owner: root
-    group: root
     mode: '0644'
 
-- name: Restart NGINX
+- name: Ensure Nginx is running
   systemd:
     name: nginx
     state: restarted
+    enabled: yes
+
+- name: Test Nginx configuration
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+
+- name: Fail if Nginx config test failed
+  fail:
+    msg: "Nginx configuration is invalid!"
+  when: nginx_test.rc != 0

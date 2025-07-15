@@ -13,5 +13,7 @@
     docker_restart_policy: "unless-stopped"
 
   roles:
+    - docker
     - flask
     - nginx
+    - certbot

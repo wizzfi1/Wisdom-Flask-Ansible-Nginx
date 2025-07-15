@@ -1,5 +1,5 @@
 ---
-container_name: "wisdom"
+container_name: "wisdom-flask"
 container_port: 5000
-docker_image: "wizfi/wisdom-flask"
+docker_image: "wizfi/wisdom-flask:latest"
 docker_restart_policy: "unless-stopped"
