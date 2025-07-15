@@ -1,100 +1,40 @@
-name: Deploy Flask App with Terraform + Ansible
+name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'infra/**'
-      - 'ansible/**'
-      - '.github/workflows/deploy.yml'
-
-concurrency:
-  group: deploy-${{ github.ref }}
-  cancel-in-progress: true
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    env:
-      AWS_REGION: us-east-1
-      ANSIBLE_FORCE_COLOR: 1
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.6
-          terraform_wrapper: false
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Terraform Init and Validate
-        working-directory: ./infra
-        run: |
-          terraform init -input=false
-          terraform validate
+    - name: Build and push Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/wisdom-flask:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/wisdom-flask:latest
 
-      - name: Terraform Plan
-        working-directory: ./infra
-        run: terraform plan -input=false -out=tfplan
+    - name: Copy SSH key
+      run: |
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+        chmod 600 private_key.pem
 
-      - name: Terraform Apply
-        working-directory: ./infra
-        run: terraform apply -input=false -auto-approve tfplan
-
-      - name: Get EC2 IP
-        id: ec2ip
-        working-directory: ./infra
-        run: |
-          ip=$(terraform output -raw ec2_public_ip)
-          echo "ip=${ip}" >> "$GITHUB_OUTPUT"
-          echo "::set-output name=ip::$ip"
-
-      - name: Setup Ansible
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ansible sshpass
-
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ steps.ec2ip.outputs.ip }} >> ~/.ssh/known_hosts
-          echo -e "Host *\n  StrictHostKeyChecking=no\n" > ~/.ssh/config
-          
-          
-      - name: Create Dynamic Inventory
-        run: |
-            echo "[ec2]" > ansible/inventory.ini
-            echo "${{ steps.ec2ip.outputs.ip }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Ansible Lint (optional)
-        run: |
-          sudo apt-get install -y ansible-lint
-          ansible-lint ansible/site.yml || true
-
-      - name: Ping EC2 Instance
-        run: ansible all -i ansible/inventory.ini -m ping
-
-      - name: Run Ansible Playbook
-        run: ansible-playbook -i ansible/inventory.ini ansible/site.yml -vv
-        env:
-          ANSIBLE_HOST_KEY_CHECKING: "False"
+    - name: Run Ansible Playbook
+      run: |
+        sudo apt-get update && sudo apt-get install -y ansible sshpass
+        ansible-playbook -i "${{ secrets.EC2_HOST }}," ansible/site.yml \
+          --private-key private_key.pem \
+          -u ${{ secrets.EC2_USER }} \
+          -e "ansible_python_interpreter=/usr/bin/python3"
