@@ -3,9 +3,10 @@ provider "aws" {
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = "wisdom-deploy-key"
-  public_key = file("${path.module}/${var.public_key_path}")
+  key_name   = "github-deploy-key"
+  public_key = file("${path.module}/github-deploy.pub")
 }
+
 
 resource "aws_security_group" "flask_sg" {
   name        = "flask-sg"
