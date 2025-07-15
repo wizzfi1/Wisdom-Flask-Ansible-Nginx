@@ -4,8 +4,14 @@
     state: present
     update_cache: yes
 
-- name: Enable and start Docker
+- name: Ensure Docker is running
   systemd:
     name: docker
-    enabled: true
     state: started
+    enabled: true
+
+- name: Add user to Docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes

@@ -1,28 +1,26 @@
----
-- name: Install Nginx
+- name: Install NGINX
   apt:
     name: nginx
     state: present
     update_cache: yes
 
-- name: Copy Nginx configuration
-  template:
-    src: nginx.conf.j2
+- name: Copy NGINX config
+  copy:
     dest: /etc/nginx/sites-available/default
-    mode: '0644'
+    content: |
+      server {
+          listen 80;
+          server_name wizfi-devops.duckdns.org;
 
-- name: Ensure Nginx is running
+          location / {
+              proxy_pass http://localhost:5000;
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+          }
+      }
+
+- name: Restart NGINX
   systemd:
     name: nginx
     state: restarted
     enabled: yes
-
-- name: Test Nginx configuration
-  command: nginx -t
-  register: nginx_test
-  changed_when: false
-
-- name: Fail if Nginx config test failed
-  fail:
-    msg: "Nginx configuration is invalid!"
-  when: nginx_test.rc != 0

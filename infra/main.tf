@@ -3,32 +3,15 @@ provider "aws" {
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = "github-deploy-key"
-  public_key = file("${path.module}/github-deploy.pub")
+  key_name   = "wisdom-deploy-key"
+  public_key = file("${path.module}/${var.public_key_path}")
 }
 
-resource "aws_security_group" "wisdom_sg" {
-  name        = "wisdom-flask-sg"
-  description = "Allow Flask, SSH, HTTP, and HTTPS"
+resource "aws_security_group" "flask_sg" {
+  name        = "flask-sg"
 
   ingress {
-    description = "Flask app port"
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Allow HTTP (Certbot)"
+    description = "Allow HTTP"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -43,7 +26,24 @@ resource "aws_security_group" "wisdom_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "Allow Flask"
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "Allow SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -51,11 +51,11 @@ resource "aws_security_group" "wisdom_sg" {
   }
 }
 
-resource "aws_instance" "flask_ec2" {
-ami = "ami-053b0d53c279acc90"  # ✅ Ubuntu 22.04 LTS (x86_64) for us-east-1
-  instance_type = "t2.micro"
-  key_name      = aws_key_pair.deployer.key_name
-  vpc_security_group_ids = [aws_security_group.wisdom_sg.id]
+resource "aws_instance" "flask_server" {
+  ami                    = "ami-053b0d53c279acc90" # Ubuntu 22.04 LTS in us-east-1
+  instance_type          = var.instance_type
+  key_name               = aws_key_pair.deployer.key_name
+  vpc_security_group_ids = [aws_security_group.flask_sg.id]
 
   tags = {
     Name = "Wisdom-Flask-EC2"
@@ -64,8 +64,4 @@ ami = "ami-053b0d53c279acc90"  # ✅ Ubuntu 22.04 LTS (x86_64) for us-east-1
   provisioner "local-exec" {
     command = "echo ${self.public_ip} > ec2_ip.txt"
   }
-}
-
-output "ec2_public_ip" {
-  value = aws_instance.flask_ec2.public_ip
 }

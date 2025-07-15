@@ -1,48 +1,21 @@
----
-- name: Update apt and install required packages
-  apt:
-    update_cache: yes
-    name:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - software-properties-common
-      - docker.io
-    state: present
-
-- name: Ensure Docker is running and enabled
-  systemd:
-    name: docker
-    state: started
-    enabled: yes
-
-- name: Add user to Docker group
-  user:
-    name: "{{ ansible_user }}"
-    groups: docker
-    append: yes
-
-- name: Pull latest Docker image
+- name: Pull Flask app image
   docker_image:
-    name: "{{ docker_image }}"
+    name: wizfi/wisdom-flask
     source: pull
-    force_source: yes
 
-- name: Remove any existing container
+- name: Remove existing container
   docker_container:
-    name: "{{ container_name }}"
+    name: wisdom
     state: absent
     force_kill: true
 
-- name: Run the Flask container
+- name: Run Flask container
   docker_container:
-    name: "{{ container_name }}"
-    image: "{{ docker_image }}"
+    name: wisdom
+    image: wizfi/wisdom-flask
     state: started
-    restart_policy: "{{ docker_restart_policy }}"
+    restart_policy: always
     ports:
-      - "{{ container_port }}:{{ container_port }}"
+      - "5000:5000"
     env:
       FLASK_ENV: production
-    volumes:
-      - "/var/log/wisdom:/app/logs"

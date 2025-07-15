@@ -1,24 +1,22 @@
 - name: Install Certbot & dependencies
   apt:
-    name: "{{ item }}"
+    name:
+      - software-properties-common
+      - certbot
+      - python3-certbot-nginx
     state: present
     update_cache: yes
-  loop:
-    - software-properties-common
-    - certbot
-    - python3-certbot-nginx
 
 - name: Obtain SSL certificate
   command: >
     certbot --nginx --non-interactive --agree-tos
     -m shaibuwisdom@gmail.com
     -d wizfi-devops.duckdns.org
-  args:
-    creates: /etc/letsencrypt/live/yourdomain.com/fullchain.pem
 
 - name: Set up automatic renewal cron job
   cron:
-    name: "Auto-renew Let's Encrypt certificates"
+    name: "Renew Let's Encrypt certificates"
     job: "certbot renew --quiet"
+    state: present
     minute: "0"
     hour: "3"

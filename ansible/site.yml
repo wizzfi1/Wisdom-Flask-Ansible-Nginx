@@ -1,19 +1,9 @@
----
 - name: Deploy Wisdom Flask Stack
   hosts: web
   become: true
-  tasks:
-     - name: Ping the EC2 instance
-       ansible.builtin.ping:
-
-  vars:
-    container_name: "wisdom"
-    container_port: 5000
-    docker_image: "wizfi/wisdom-flask"
-    docker_restart_policy: "unless-stopped"
-
   roles:
     - docker
     - flask
     - nginx
     - certbot
+    
