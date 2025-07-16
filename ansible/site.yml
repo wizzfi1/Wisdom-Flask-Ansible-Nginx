@@ -1,9 +1,14 @@
-- name: Deploy Wisdom Flask Stack
+- name: Setup Wisdom Monitoring Stack
   hosts: web
   become: true
+
+
   roles:
     - docker
     - flask
     - nginx
     - certbot
+    - prometheus
+    - node_exporter
+    - grafana
     

@@ -1,0 +1,52 @@
+---
+- name: Create temp directory for Node Exporter
+  file:
+    path: /tmp/node_exporter
+    state: directory
+
+- name: Download Node Exporter archive
+  get_url:
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-amd64.tar.gz
+    dest: /tmp/node_exporter/node_exporter.tar.gz
+
+- name: Extract Node Exporter archive
+  unarchive:
+    src: /tmp/node_exporter/node_exporter.tar.gz
+    dest: /tmp/node_exporter/
+    remote_src: yes
+
+- name: Move Node Exporter binary to /usr/local/bin
+  become: true
+  copy:
+    src: /tmp/node_exporter/node_exporter-1.8.1.linux-amd64/node_exporter
+    dest: /usr/local/bin/node_exporter
+    mode: '0755'
+    remote_src: yes
+
+- name: Create systemd service for Node Exporter
+  become: true
+  copy:
+    dest: /etc/systemd/system/node_exporter.service
+    content: |
+      [Unit]
+      Description=Node Exporter
+      After=network.target
+
+      [Service]
+      User=nobody
+      ExecStart=/usr/local/bin/node_exporter
+
+      [Install]
+      WantedBy=default.target
+
+- name: Reload systemd daemon
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start Node Exporter
+  become: true
+  systemd:
+    name: node_exporter
+    enabled: yes
+    state: started
