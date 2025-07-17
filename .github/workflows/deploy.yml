@@ -53,6 +53,6 @@ jobs:
           --private-key ~/.ssh/github-deploy \
           -u ubuntu \
           -e "ansible_python_interpreter=/usr/bin/python3"
-  env:
-    ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+      env:
+        ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
      
