@@ -43,3 +43,16 @@ jobs:
           --private-key ~/.ssh/github-deploy \
           -u ${{ secrets.EC2_USER }} \
           -e "ansible_python_interpreter=/usr/bin/python3"
+
+    - name: Run Ansible Playbook
+      run: |
+        echo "$ANSIBLE_VAULT_PASSWORD" > vault.txt
+        ansible-playbook ansible/site.yml \
+          --vault-password-file vault.txt \
+          -i ansible/inventory.ini \
+          --private-key ~/.ssh/github-deploy \
+          -u ubuntu \
+          -e "ansible_python_interpreter=/usr/bin/python3"
+  env:
+    ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+     
