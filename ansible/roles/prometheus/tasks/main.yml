@@ -33,20 +33,24 @@
     - prometheus
     - promtool
 
-
 - name: Create Prometheus config
   copy:
     dest: /etc/prometheus/prometheus.yml
     content: |
       global:
         scrape_interval: 15s
+
       scrape_configs:
-        - job_name: 'node_exporter'
+        - job_name: "prometheus"
           static_configs:
-            - targets: ['localhost:9100']
+            - targets: ["localhost:9090"]
+
+        - job_name: "node_exporter"
+          static_configs:
+            - targets: ["localhost:9100"]
   notify: restart prometheus
 
-- name: Create systemd service
+- name: Create systemd service for Prometheus
   copy:
     dest: /etc/systemd/system/prometheus.service
     content: |
@@ -57,7 +61,9 @@
 
       [Service]
       User=prometheus
-      ExecStart=/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus
+      ExecStart=/usr/local/bin/prometheus \
+        --config.file=/etc/prometheus/prometheus.yml \
+        --storage.tsdb.path=/var/lib/prometheus
 
       [Install]
       WantedBy=default.target
@@ -68,4 +74,3 @@
     name: prometheus
     enabled: true
     state: started
-

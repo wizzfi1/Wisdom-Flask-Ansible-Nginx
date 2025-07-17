@@ -4,9 +4,9 @@
     state: present
     update_cache: yes
 
-- name: Copy NGINX config
+- name: Copy NGINX config for Flask
   copy:
-    dest: /etc/nginx/sites-available/default
+    dest: /etc/nginx/sites-available/flask
     content: |
       server {
           listen 80;
@@ -18,6 +18,37 @@
               proxy_set_header X-Real-IP $remote_addr;
           }
       }
+
+- name: Enable Flask site
+  file:
+    src: /etc/nginx/sites-available/flask
+    dest: /etc/nginx/sites-enabled/flask
+    state: link
+    force: yes
+
+- name: Copy NGINX config for Grafana
+  copy:
+    dest: /etc/nginx/sites-available/grafana
+    content: |
+      server {
+          listen 80;
+          server_name wizfi-grafana.duckdns.org;
+
+          location / {
+              proxy_pass http://localhost:3000;
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+          }
+      }
+
+- name: Enable Grafana site
+  file:
+    src: /etc/nginx/sites-available/grafana
+    dest: /etc/nginx/sites-enabled/grafana
+    state: link
+    force: yes
 
 - name: Restart NGINX
   systemd:

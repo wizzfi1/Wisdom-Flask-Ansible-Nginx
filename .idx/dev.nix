@@ -11,7 +11,8 @@
      pkgs.python311Packages.pip
      pkgs.nodejs_20
      pkgs.nodePackages.nodemon
-     pkgs.docker 
+     pkgs.docker
+     pkgs.prometheus.cli 
      pkgs.docker-client
      pkgs.openssh
      pkgs.tenv
