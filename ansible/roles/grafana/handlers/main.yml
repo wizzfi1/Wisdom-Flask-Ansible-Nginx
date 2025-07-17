@@ -1,0 +1,12 @@
+- name: restart grafana
+  service:
+    name: grafana-server
+    state: restarted
+
+- name: Restart Prometheus
+  ansible.builtin.systemd:
+    name: prometheus
+    state: restarted
+
+- name: Restart Flask App
+  ansible.builtin.shell: docker restart flask_app_container

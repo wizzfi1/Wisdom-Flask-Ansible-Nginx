@@ -1,5 +1,5 @@
 - name: Setup Wisdom Monitoring Stack
-  hosts: web
+  hosts: all
   become: true
 
 

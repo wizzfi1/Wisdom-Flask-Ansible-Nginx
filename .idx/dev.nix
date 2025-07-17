@@ -19,6 +19,7 @@
      pkgs.sudo
      pkgs.awscli
      pkgs.busybox
+     pkgs.grafana
      ];
 
   # Sets environment variables in the workspace
