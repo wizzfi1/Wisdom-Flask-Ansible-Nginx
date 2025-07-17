@@ -36,15 +36,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y ansible
 
-    - name: Run Ansible Playbook
-      run: |
-        ansible-playbook ansible/site.yml \
-          -i "${{ secrets.EC2_HOST }}," \
-          --private-key ~/.ssh/github-deploy \
-          -u ${{ secrets.EC2_USER }} \
-          -e "ansible_python_interpreter=/usr/bin/python3"
-
-    - name: Run Ansible Playbook
+    - name: Run Ansible Playbook with Vault
       run: |
         echo "$ANSIBLE_VAULT_PASSWORD" > vault.txt
         ansible-playbook ansible/site.yml \
@@ -53,6 +45,6 @@ jobs:
           --private-key ~/.ssh/github-deploy \
           -u ubuntu \
           -e "ansible_python_interpreter=/usr/bin/python3"
+        rm -f vault.txt
       env:
         ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-     
