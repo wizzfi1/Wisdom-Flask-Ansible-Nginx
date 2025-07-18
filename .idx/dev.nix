@@ -20,6 +20,7 @@
      pkgs.sudo
      pkgs.awscli
      pkgs.busybox
+     pkgs.nano
      pkgs.grafana
      ];
 

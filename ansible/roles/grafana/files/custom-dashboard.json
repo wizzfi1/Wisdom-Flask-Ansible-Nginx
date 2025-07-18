@@ -1,0 +1,41 @@
+{
+  "dashboard": {
+    "title": "Flask Application Metrics",
+    "panels": [
+      {
+        "title": "HTTP Requests",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "targets": [{
+          "expr": "rate(flask_http_request_total[1m])",
+          "legendFormat": "{{method}} {{handler}}"
+        }]
+      },
+      {
+        "title": "CPU/Memory Usage",
+        "type": "row",
+        "panels": [
+          {
+            "title": "CPU %",
+            "type": "gauge",
+            "gridPos": {"x": 0, "y": 8, "w": 6, "h": 6},
+            "targets": [{
+              "expr": "100 - (avg by(instance)(rate(node_cpu_seconds_total{mode='idle'}[1m])) * 100"
+            }]
+          },
+          {
+            "title": "Memory %",
+            "type": "gauge",
+            "gridPos": {"x": 6, "y": 8, "w": 6, "h": 6},
+            "targets": [{
+              "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100"
+            }]
+          }
+        ]
+      }
+    ],
+    "tags": ["flask", "monitoring"],
+    "timezone": "browser"
+  },
+  "overwrite": true
+}

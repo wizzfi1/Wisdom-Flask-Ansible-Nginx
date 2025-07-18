@@ -1,0 +1,36 @@
+- name: Ensure dashboard import directory exists
+  file:
+    path: /etc/grafana/provisioning/dashboards
+    state: directory
+
+- name: Create dashboards provisioning config
+  copy:
+    dest: /etc/grafana/provisioning/dashboards/ansible.yaml
+    content: |
+      apiVersion: 1
+      providers:
+        - name: 'Ansible Imported Dashboards'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards
+
+- name: Ensure dashboards directory exists
+  file:
+    path: /var/lib/grafana/dashboards
+    state: directory
+
+- name: Download dashboard JSON from Grafana.com
+  get_url:
+    url: https://grafana.com/api/dashboards/11074/revisions/1/download
+    dest: /var/lib/grafana/dashboards/node_exporter_dashboard.json
+    headers:
+      Accept: "application/json"
+
+- name: Restart Grafana to load new dashboard
+  systemd:
+    name: grafana-server
+    state: restarted
