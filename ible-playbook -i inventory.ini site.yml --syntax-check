@@ -1,0 +1,32 @@
+ansible.builtin.local          execute on controller                       
+ansible.builtin.paramiko_ssh   Run tasks via Python SSH (paramiko)         
+ansible.builtin.psrp           Run tasks over Microsoft PowerShell Remoting...
+ansible.builtin.ssh            connect via SSH client binary               
+ansible.builtin.winrm          Run tasks over Microsoft's WinRM            
+ansible.netcommon.grpc         Provides a persistent connection using the g...
+ansible.netcommon.httpapi      Use httpapi to run command on network applia...
+ansible.netcommon.libssh       Run tasks using libssh for ssh connection   
+ansible.netcommon.netconf      Provides a persistent connection using the n...
+ansible.netcommon.network_cli  Use network_cli to run command on network ap...
+ansible.netcommon.persistent   Use a persistent unix socket for connection 
+community.aws.aws_ssm          connect to EC2 instances via AWS Systems Man...
+community.docker.docker        Run tasks in docker containers              
+community.docker.docker_api    Run tasks in docker containers              
+community.docker.nsenter       execute on host running controller container
+community.general.chroot       Interact with local chroot                  
+community.general.funcd        Use funcd to connect to target              
+community.general.incus        Run tasks in Incus instances via the Incus C...
+community.general.iocage       Run tasks in iocage jails                   
+community.general.jail         Run tasks in jails                          
+community.general.lxc          Run tasks in lxc containers via lxc python l...
+community.general.lxd          Run tasks in LXD instances via `lxc' CLI    
+community.general.qubes        Interact with an existing QubesOS AppVM     
+community.general.saltstack    Allow ansible to piggyback on salt minions  
+community.general.zone         Run tasks in a zone instance                
+community.libvirt.libvirt_lxc  Run tasks in lxc containers via libvirt     
+community.libvirt.libvirt_qemu Run tasks on libvirt/qemu virtual machines  
+community.okd.oc               Execute tasks in pods running on OpenShift  
+community.vmware.vmware_tools  Execute tasks inside a VM via VMware Tools  
+containers.podman.buildah      Interact with an existing buildah container 
+containers.podman.podman       Interact with an existing podman container  
+kubernetes.core.kubectl        Execute tasks in pods running on Kubernetes 

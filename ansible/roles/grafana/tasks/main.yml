@@ -123,13 +123,3 @@
     src: ../flask/app_with_metrics.py
     dest: /opt/flask/app.py
   notify: Restart Flask App
-
-- name: Update Prometheus config to scrape Flask app metrics
-  blockinfile:
-    path: /etc/prometheus/prometheus.yml
-    marker: "# {mark} FLASK SCRAPE CONFIG"
-    block: |
-      - job_name: 'flask_app'
-        static_configs:
-          - targets: ['localhost:8000']
-  notify: Restart Prometheus

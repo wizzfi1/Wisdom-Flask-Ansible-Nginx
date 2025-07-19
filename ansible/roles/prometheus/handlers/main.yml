@@ -6,3 +6,10 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+
+- name: Clean duplicate configs
+  lineinfile:
+    path: /etc/prometheus/prometheus.yml
+    regexp: '^# BEGIN FLASK SCRAPE CONFIG|^# END FLASK SCRAPE CONFIG'
+    state: absent
+  notify: Restart Prometheus

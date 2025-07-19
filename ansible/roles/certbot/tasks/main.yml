@@ -7,11 +7,13 @@
     state: present
     update_cache: yes
 
-- name: Obtain SSL certificate
+- name: Obtain SSL certificate (only if not already exists)
   command: >
     certbot --nginx --non-interactive --agree-tos
     -m shaibuwisdom@gmail.com
     -d wizfi-devops.duckdns.org
+  args:
+    creates: /etc/letsencrypt/live/wizfi-devops.duckdns.org/fullchain.pem
 
 - name: Set up automatic renewal cron job
   cron:

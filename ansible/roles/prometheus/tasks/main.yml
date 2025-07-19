@@ -54,13 +54,13 @@
     mode: 0644
   notify: restart prometheus
 
-- name: Deploy Prometheus config file
-  template:
+- name: Deploy prometheus.yml config from template
+  ansible.builtin.template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   notify: Restart Prometheus
 
 - name: Create systemd service
