@@ -1,7 +1,10 @@
 - name: Setup Wisdom Monitoring Stack
   hosts: all
   become: true
-
+  vars:
+    grafana_domain: wizfi-grafana.duckdns.org
+    flask_domain: wizfi-devops.duckdns.org
+    email: shaibuwisdom@gmail.com
 
   roles:
     - docker

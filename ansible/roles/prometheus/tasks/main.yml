@@ -25,8 +25,22 @@
     dest: /tmp/
     remote_src: yes
 
-- name: Validate alert rules syntax
-  command: promtool check rules "{{ playbook_dir }}/roles/prometheus/files/alert.rules.yml"
+- name: Move Prometheus and promtool binaries to /usr/local/bin
+  copy:
+    remote_src: yes
+    src: "/tmp/prometheus-2.52.0.linux-amd64/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: '0755'
+  loop:
+    - prometheus
+    - promtool
+
+- name: Validate alert rules syntax locally before deploying
+  delegate_to: localhost
+  run_once: true
+  become: false
+  command: >
+    promtool check rules {{ playbook_dir }}/roles/prometheus/files/alert.rules.yml
   register: rules_check
   changed_when: false
   failed_when: rules_check.rc != 0
@@ -40,15 +54,14 @@
     mode: 0644
   notify: restart prometheus
 
-- name: Deploy prometheus config
+- name: Deploy Prometheus config file
   template:
     src: prometheus.yml.j2
     dest: /etc/prometheus/prometheus.yml
-    owner: prometheus
-    group: prometheus
+    owner: root
+    group: root
     mode: 0644
-    validate: promtool check config %s
-  notify: restart prometheus
+  notify: Restart Prometheus
 
 - name: Create systemd service
   template:

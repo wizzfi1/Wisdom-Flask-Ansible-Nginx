@@ -1,3 +1,5 @@
+---
+# GRAFANA INSTALL & CONFIGURE
 - name: Add Grafana APT key
   apt_key:
     url: https://packages.grafana.com/gpg.key
@@ -14,50 +16,82 @@
     state: present
     update_cache: yes
 
-- name: Start and enable Grafana service
+- name: Set Grafana admin username
+  lineinfile:
+    path: /etc/grafana/grafana.ini
+    regexp: '^;?admin_user ='
+    line: 'admin_user = admin'
+
+- name: Set Grafana admin password from Vault
+  lineinfile:
+    path: /etc/grafana/grafana.ini
+    regexp: '^;?admin_password ='
+    line: "admin_password = {{ grafana_admin_password }}"
+
+- name: Restart Grafana to apply admin credentials
   systemd:
     name: grafana-server
+    state: restarted
     enabled: yes
-    state: started
 
+- name: Wait for Grafana to be available
+  uri:
+    url: "https://wizfi-grafana.duckdns.org"
+    method: GET
+    status_code: 200
+    return_content: no
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 5
+
+# DASHBOARDS — Node Exporter (1860)
 - name: Download Node Exporter Dashboard JSON (1860)
-  ansible.builtin.get_url:
+  get_url:
     url: "https://grafana.com/api/dashboards/1860/revisions/27/download"
     dest: "/tmp/node_exporter_dashboard.json"
     mode: '0644'
 
-- name: Upload dashboard to Grafana
+- name: Upload Node Exporter dashboard to Grafana
   community.grafana.grafana_dashboard:
-    grafana_url: "http://localhost:3000"
-    grafana_user: admin
-    grafana_password: "{{ grafana_admin_password }}"
-    state: present
-    path: "/tmp/node_exporter_dashboard.json"
-
-
-- name: Download Flask App Dashboard JSON (12559)
-  get_url:
-    url: "https://grafana.com/api/dashboards/12559/revisions/1/download"
-    dest: "/tmp/flask_dashboard.json"
-
-- name: Upload Flask App Dashboard to Grafana
-  community.grafana.grafana_dashboard:
-    grafana_url: "http://localhost:3000"
+    grafana_url: "https://{{ grafana_domain }}"
     grafana_user: "admin"
     grafana_password: "{{ grafana_admin_password }}"
     state: present
     overwrite: true
-    path: "/tmp/flask_dashboard.json"
+    path: "/tmp/node_exporter_dashboard.json"
+    validate_certs: false
 
-- name: Download EC2 Dashboard JSON
-  ansible.builtin.uri:
+# DASHBOARDS — Flask App (9585)
+- name: Download Flask Dashboard JSON (9585)
+  uri:
+    url: "https://grafana.com/api/dashboards/9585/revisions/latest/download"
+    method: GET
+    return_content: yes
+  register: flask_dashboard_json_response
+
+- name: Save Flask Dashboard JSON to File
+  copy:
+    content: "{{ flask_dashboard_json_response.content }}"
+    dest: /tmp/flask_dashboard.json
+
+- name: Upload Flask Dashboard to Grafana
+  community.grafana.grafana_dashboard:
+    grafana_url: "https://{{ grafana_domain }}"
+    grafana_user: "admin"
+    grafana_password: "{{ grafana_admin_password }}"
+    state: present
+    overwrite: true
+    path: /tmp/flask_dashboard.json
+    validate_certs: false
+
+# DASHBOARDS — EC2 (11074)
+- name: Download EC2 Dashboard JSON (11074)
+  uri:
     url: "https://grafana.com/api/dashboards/11074/revisions/1/download"
     method: GET
     return_content: yes
   register: ec2_dashboard_json
-
-
-
 
 - name: Save EC2 Dashboard JSON to File
   copy:
@@ -66,29 +100,23 @@
 
 - name: Upload EC2 Dashboard to Grafana
   community.grafana.grafana_dashboard:
-    grafana_url: "http://localhost:3000"
+    grafana_url: "https://{{ grafana_domain }}"
     grafana_user: "admin"
     grafana_password: "{{ grafana_admin_password }}"
     state: present
     overwrite: true
     path: /tmp/ec2_dashboard.json
+    validate_certs: false
 
-#  FLASK APP METRICS SETUP 
-
+# FLASK METRICS INTEGRATION
 - name: Ensure Prometheus Flask Exporter is installed in Flask container
-  ansible.builtin.shell: |
-    docker exec wisdom pip install prometheus_flask_exporter
+  shell: docker exec wisdom pip install prometheus_flask_exporter
 
 - name: Ensure /opt/flask directory exists
-  ansible.builtin.file:
+  file:
     path: /opt/flask
     state: directory
     mode: '0755'
-
-- name: Debug Flask Dashboard JSON
-  debug:
-    var: flask_dashboard_json
-
 
 - name: Copy updated Flask app with metrics support
   copy:
@@ -105,38 +133,3 @@
         static_configs:
           - targets: ['localhost:8000']
   notify: Restart Prometheus
-
-- name: "Download Flask Dashboard JSON from Grafana Labs (ID: 9585)"
-  ansible.builtin.uri:
-    url: "https://grafana.com/api/dashboards/9585/revisions/latest/download"
-    method: GET
-    return_content: yes
-  register: flask_dashboard_json_response
-
-
-- name: Set fact for Flask dashboard JSON
-  set_fact:
-    flask_dashboard_json: "{{ flask_dashboard_json_response.content }}"
-
-
-- name: Save Flask Dashboard JSON to File
-  copy:
-    content: "{{ flask_dashboard_json }}"
-    dest: /etc/grafana/provisioning/dashboards/flask_dashboard.json
-  become: yes
-
-
-- name: Upload Flask Dashboard to Grafana
-  community.grafana.grafana_dashboard:
-    grafana_url: "http://localhost:3000"
-    grafana_user: "admin"
-    grafana_password: "{{ grafana_admin_password }}"
-    state: present
-    overwrite: true
-    path: /tmp/flask_dashboard.json
-
-
-
-
-
-

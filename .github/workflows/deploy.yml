@@ -5,23 +5,32 @@ on:
     tags:
       - 'v*'
 
+env:
+  GRAFANA_DOMAIN: wizfi-grafana.duckdns.org
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    needs: build  # Optional: Require build job to succeed first
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           echo "${{ secrets.KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
-      - uses: ansible/ansible-setup-action@v1
-      - name: Run Ansible
+      
+      - name: Deploy with Ansible
         run: |
           ansible-playbook ansible/site.yml \
             --vault-password-file <(echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}") \
             -i ansible/inventory.ini \
             --private-key ~/.ssh/deploy_key \
-            -u ubuntu
+            -u ubuntu \
+            -e "grafana_domain=$GRAFANA_DOMAIN"
+      
+      - name: Deploy Grafana
+        run: |
+          ssh -i ~/.ssh/deploy_key ubuntu@your-server-ip \
+            "docker-compose -f /path/to/your/docker-compose.yml up -d"

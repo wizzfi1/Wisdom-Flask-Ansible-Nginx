@@ -1,0 +1,11 @@
+[server]
+protocol = http
+http_port = 3000
+domain = {{ grafana_domain }}
+root_url = https://{{ grafana_domain }}/
+
+[database]
+type = sqlite3
+
+[auth]
+disable_login_form = false

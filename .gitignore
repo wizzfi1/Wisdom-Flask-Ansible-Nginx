@@ -6,3 +6,5 @@
 *.tfstate.backup
 .terraform/
 *.tfstate*
+secrets/
+.ssh/

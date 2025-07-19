@@ -11,7 +11,7 @@ scrape_configs:
 
   - job_name: "node_exporter"
     static_configs:
-      - targets: ["localhost:9100"]
+      - targets: ["13.221.106.89:9100"]
 
   - job_name: "flask_app"
     static_configs:

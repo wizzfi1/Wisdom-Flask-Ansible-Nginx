@@ -1,57 +1,128 @@
-- name: Install NGINX
-  apt:
-    name: nginx
-    state: present
-    update_cache: yes
 
-- name: Copy NGINX config for Flask
-  copy:
-    dest: /etc/nginx/sites-available/flask
-    content: |
-      server {
-          listen 80;
-          server_name wizfi-devops.duckdns.org;
+    - name: Install NGINX
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
 
-          location / {
-              proxy_pass http://localhost:5000;
-              proxy_set_header Host $host;
-              proxy_set_header X-Real-IP $remote_addr;
+    - name: Ensure UFW allows HTTP and HTTPS (optional if UFW enabled)
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop: [80, 443]
+
+    - name: Create NGINX config for Flask
+      copy:
+        dest: /etc/nginx/sites-available/flask
+        content: |
+          server {
+              listen 80;
+              server_name {{ flask_domain }};
+
+              location / {
+                  proxy_pass http://localhost:5000;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+              }
           }
-      }
 
-- name: Enable Flask site
-  file:
-    src: /etc/nginx/sites-available/flask
-    dest: /etc/nginx/sites-enabled/flask
-    state: link
-    force: yes
+    - name: Create NGINX config for Grafana
+      copy:
+        dest: /etc/nginx/sites-available/grafana
+        content: |
+          server {
+              listen 80;
+              server_name {{ grafana_domain }};
 
-- name: Copy NGINX config for Grafana
-  copy:
-    dest: /etc/nginx/sites-available/grafana
-    content: |
-      server {
-          listen 80;
-          server_name wizfi-grafana.duckdns.org;
-
-          location / {
-              proxy_pass http://localhost:3000;
-              proxy_set_header Host $host;
-              proxy_set_header X-Real-IP $remote_addr;
-              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
+              location / {
+                  proxy_pass http://localhost:3000;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                  proxy_set_header X-Forwarded-Proto $scheme;
+              }
           }
-      }
 
-- name: Enable Grafana site
-  file:
-    src: /etc/nginx/sites-available/grafana
-    dest: /etc/nginx/sites-enabled/grafana
-    state: link
-    force: yes
+    - name: Enable Flask site
+      file:
+        src: /etc/nginx/sites-available/flask
+        dest: /etc/nginx/sites-enabled/flask
+        state: link
+        force: yes
 
-- name: Restart NGINX
-  systemd:
-    name: nginx
-    state: restarted
-    enabled: yes
+    - name: Enable Grafana site
+      file:
+        src: /etc/nginx/sites-available/grafana
+        dest: /etc/nginx/sites-enabled/grafana
+        state: link
+        force: yes
+
+    - name: Remove default site
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Test NGINX config
+      command: nginx -t
+      register: nginx_test
+      ignore_errors: true
+
+    - name: Fail if NGINX test fails
+      fail:
+        msg: "NGINX configuration test failed"
+      when: nginx_test.rc != 0
+
+    - name: Restart NGINX
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+
+    - name: Install Certbot and NGINX plugin
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - certbot
+        - python3-certbot-nginx
+
+    - name: Wait for DNS to resolve Grafana domain
+      wait_for:
+        host: "{{ grafana_domain }}"
+        port: 80
+        timeout: 30
+
+    - name: Wait for DNS to resolve Flask domain
+      wait_for:
+        host: "{{ flask_domain }}"
+        port: 80
+        timeout: 30
+
+    - name: Obtain SSL cert for Grafana
+      command: >
+        certbot --nginx
+        -d {{ grafana_domain }}
+        -m {{ email }}
+        --agree-tos
+        --redirect
+        --non-interactive
+        --force-renewal
+
+    - name: Obtain SSL cert for Flask
+      command: >
+        certbot --nginx
+        -d {{ flask_domain }}
+        -m {{ email }}
+        --agree-tos
+        --redirect
+        --non-interactive
+        --force-renewal
+
+    - name: Reload NGINX after SSL
+      systemd:
+        name: nginx
+        state: reloaded

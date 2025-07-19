@@ -9,4 +9,4 @@
     state: restarted
 
 - name: Restart Flask App
-  ansible.builtin.shell: docker restart flask_app_container
+  ansible.builtin.shell: docker restart wisdom
