@@ -1,129 +1,136 @@
-# 🚀 Wisdom Flask Ansible
+# 🚀 Wisdom Flask Ansible NGINX
 
 ![Terraform](https://img.shields.io/badge/Terraform-IaC-blueviolet?logo=terraform)
 ![Ansible](https://img.shields.io/badge/Ansible-Automation-red?logo=ansible)
 ![Docker](https://img.shields.io/badge/Docker-Container-blue?logo=docker)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-blue?logo=githubactions)
 ![AWS](https://img.shields.io/badge/AWS-EC2-orange?logo=amazonaws)
-
-
-A fully automated Flask application deployment pipeline built with **Terraform**, **Ansible**, **Docker**, and **GitHub Actions**.
-
-This project provisions AWS infrastructure, configures EC2, and deploys a Dockerized Flask app — all triggered by a single `git push`.
-
----
-
-## 📦 Tech Stack
-
-- **AWS EC2** – compute environment for app hosting  
-- **Terraform** – infrastructure provisioning (IaaC)  
-- **Ansible** – remote configuration and Docker deployment  
-- **Docker** – containerized Flask application  
-- **GitHub Actions** – CI/CD automation  
-- **Docker Hub** – image storage & delivery  
+![NGINX](https://img.shields.io/badge/NGINX-Reverse--Proxy-darkgreen?logo=nginx)
+![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-orange?logo=prometheus)
+![Grafana](https://img.shields.io/badge/Grafana-Dashboards-yellow?logo=grafana)
+![Python](https://img.shields.io/badge/Python-Flask-blue?logo=python)
 
 ---
 
-## 🧱 Architecture
+## 📌 About the Project
 
-```text
-┌──────────────┐       ┌──────────────┐       ┌────────────────────┐
-│  GitHub Repo │ ───▶  │ GitHub Actions │ ───▶ │ Terraform (infra/) │
-└──────────────┘       └──────────────┘       └────────┬──────────┘
-                                                       ▼
-                                               ┌──────────────┐
-                                               │   AWS EC2    │
-                                               │ Ubuntu + SG  │
-                                               └──────┬───────┘
-                                                      ▼
-                                               ┌──────────────┐
-                                               │  Ansible CI  │
-                                               │ Installs Docker
-                                               │ Runs Flask App │
-                                               └──────┬───────┘
-                                                      ▼
-                                               ┌──────────────┐
-                                               │ Docker Hub   │
-                                               │ wizfi/wisdom │
-                                               └──────────────┘
+**Wisdom-flask-ansible-nginx** is a full production-ready Flask app deployed on an AWS EC2 instance using **Terraform**, **Docker**, and **Ansible** — complete with:
+
+- Automated CI/CD via GitHub Actions
+- Real-time monitoring using Prometheus + Grafana
+- NGINX reverse proxy with **Let's Encrypt SSL**
+- Ngrok for local testing
+- Fully containerized and infrastructure-as-code
+
+This isn't just another portfolio project — this is **"I need this guy on my team!"** DevOps done right.
+
+---
+
+## 🧱 Architecture Overview
+
+![Architecture Diagram](images/architecture-diagram.png)
+
+---
+
+## ⚙️ Features
+
+- 🔄 **GitHub Actions** automatically builds + pushes Docker images
+- ☁️ **Terraform** provisions EC2 infra
+- 🚀 **Ansible** deploys full stack: Docker, Flask app, NGINX, Prometheus, Grafana
+- 🔐 **HTTPS with Let's Encrypt** using Certbot
+- 📊 **Live Monitoring**: CPU, Memory, App Health via Grafana dashboard
+- 🔁 Ngrok tunnel for local dev testing (secure preview)
+
+---
+
+## 🧪 Monitoring & Alerting
+
+- 📈 **Prometheus** scrapes EC2 + Node Exporter metrics
+- 📊 **Grafana** dashboards visualize system + app health
+- 🔔 **Slack Alerts** for high CPU usage (Grafana contact points via SMTP)
+
+---
+
+## 🚀 Run This Project
+
+### 🔧 1. Clone and configure secrets
+
+```
+git clone https://github.com/wizzfi1/Wisdom-flask-ansible-nginx.git
+cd Wisdom-flask-ansible-nginx
 
 
-📁 Folder Structure
+🏗️ 2. Provision Infra (EC2) with Terraform
 
-Wisdom-Flask-Ansible/
-├── ansible/
-│   ├── site.yml              # Ansible playbook
-│   └── inventory.ini         # Dynamic inventory from GitHub Action
-├── infra/
-│   ├── main.tf               # Terraform AWS EC2 & keypair setup
-│   ├── github-deploy.pub     # Public key used for SSH
-├── .github/
-│   └── workflows/
-│       └── deploy.yml        # GitHub Actions CI/CD workflow
-├── .gitignore
-├── README.md                 # You're here!
-
-
-💡 How It Works
--Push to main branch
-
--GitHub Actions runs deploy.yml
-
--Terraform provisions:
-
-EC2 instance
-
-Security group (ports 22, 5000)
-
-Injects SSH key
-
-Action extracts EC2 public IP
-
--Ansible connects via SSH:
-
-Installs Docker
-
-Pulls Flask image from Docker Hub
-
-Runs container on port 5000
-
-🌍 Live App
-
-🔗 http://52.55.169.248:5000
-
-🧪 Local Testing (Optional)
-You can test everything locally before pushing:
-
-# Infra
 cd infra
 terraform init
 terraform apply
 
-# Deploy
+🤖 3. Deploy App via Ansible
+
 cd ansible
 ansible-playbook -i inventory.ini site.yml
 
-🔐 GitHub Secrets Required
+🌍 Live Demo
+You can preview your app locally using Ngrok:
 
-| Secret Name             | Description                                   |
-| ----------------------- | --------------------------------------------- |
-| `AWS_ACCESS_KEY_ID`     | IAM access key for AWS                        |
-| `AWS_SECRET_ACCESS_KEY` | IAM secret key for AWS                        |
-| `SSH_PRIVATE_KEY`       | EC2 private key (from `~/.ssh/github-deploy`) |
-| `EC2_SSH_USER`          | Typically `ubuntu`                            |
-| `DOCKERHUB_USERNAME`    | Docker Hub login                              |
-| `DOCKERHUB_TOKEN`       | Docker Hub access token                       |
+ngrok http 5000
+
+Or visit the public HTTPS URL hosted via NGINX + Certbot on EC2.
+
+📊 Dashboard Example
+
+> Real-time system metrics displayed on Grafana
+
+![Grafana Dashboard](images/grafana-dashboard.png)
+
+---
+
+## 🔔 Slack Alert Example
+
+> Automatically triggered alert for high CPU usage
+
+![Slack Alert](images/slack-alert.png)
+
+---
+
+## 🌐 Deployed Flask App
+
+> App deployed with HTTPS via NGINX + Let's Encrypt
+
+![Flask App](images/flask-running.png)
+
+---
+
+> Real-time system metrics displayed on Prometheus
+
+![Prometheus Dashboard](images/prometheus-alert.png)
 
 
-## 🏁 Next Steps (Planned)
+🧠 Skills Demonstrated
 
-- [ ] Add **NGINX** reverse proxy  
-- [ ] Enable **HTTPS** with Let's Encrypt  
-- [ ] Connect **custom domain**  
-- [ ] Add monitoring with **Prometheus + Grafana**  
-- [ ] Move to **Kubernetes / ECS**
+✅ End-to-end Infrastructure-as-Code
+
+✅ Real-world CI/CD pipeline
+
+✅ Secure reverse proxy & HTTPS
+
+✅ Monitoring & observability
+
+✅ Reproducible, production-grade setup
 
 
-🙌 Contributions
-This project is a learning showcase — contributions and forks are welcome!
-Feel free to star 🌟 the repo if you found it helpful.
+📂 Folder Structure Highlights
+
+Wisdom-flask-ansible-nginx/
+├── .github/workflows        # CI/CD GitHub Actions
+├── ansible/                 # Ansible roles: flask, nginx, grafana, prometheus, etc
+├── infra/                   # Terraform infra code
+├── app.py                   # Flask application
+├── docker-compose.yml
+├── Dockerfile
+├── README.md
+
+
+🪪 License
+MIT — feel free to use and build upon this project.
