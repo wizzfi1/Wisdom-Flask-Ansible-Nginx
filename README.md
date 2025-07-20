@@ -12,6 +12,8 @@
 
 ---
 
+
+
 ## 📌 About the Project
 
 **Wisdom-flask-ansible-nginx** is a full production-ready Flask app deployed on an AWS EC2 instance using **Terraform**, **Docker**, and **Ansible** — complete with:
@@ -22,7 +24,7 @@
 - Ngrok for local testing
 - Fully containerized and infrastructure-as-code
 
-This isn't just another portfolio project — this is **"I need this guy on my team!"** DevOps done right.
+
 
 ---
 
@@ -55,7 +57,7 @@ This isn't just another portfolio project — this is **"I need this guy on my t
 
 ### 🔧 1. Clone and configure secrets
 
-```
+```bash
 git clone https://github.com/wizzfi1/Wisdom-flask-ansible-nginx.git
 cd Wisdom-flask-ansible-nginx
 
@@ -66,12 +68,16 @@ cd infra
 terraform init
 terraform apply
 
+
 🤖 3. Deploy App via Ansible
 
 cd ansible
 ansible-playbook -i inventory.ini site.yml
 
+```
 🌍 Live Demo
+yaml
+
 You can preview your app locally using Ngrok:
 
 ngrok http 5000
@@ -83,7 +89,6 @@ Or visit the public HTTPS URL hosted via NGINX + Certbot on EC2.
 > Real-time system metrics displayed on Grafana
 
 ![Grafana Dashboard](images/grafana-dashboard.png)
-
 ---
 
 ## 🔔 Slack Alert Example
@@ -101,6 +106,7 @@ Or visit the public HTTPS URL hosted via NGINX + Certbot on EC2.
 ![Flask App](images/flask-running.png)
 
 ---
+```
 
 > Real-time system metrics displayed on Prometheus
 
