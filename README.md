@@ -106,12 +106,11 @@ Or visit the public HTTPS URL hosted via NGINX + Certbot on EC2.
 ![Flask App](images/flask-running.png)
 
 ---
-```
 
 > Real-time system metrics displayed on Prometheus
 
 ![Prometheus Dashboard](images/prometheus-alert.png)
-
+```
 
 🧠 Skills Demonstrated
 
