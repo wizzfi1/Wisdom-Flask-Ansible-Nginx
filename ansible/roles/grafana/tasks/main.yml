@@ -62,7 +62,6 @@
     path: "/tmp/node_exporter_dashboard.json"
     validate_certs: false
 
-# DASHBOARDS — Flask App (9585)
 - name: Download Flask Dashboard JSON (9585)
   uri:
     url: "https://grafana.com/api/dashboards/9585/revisions/latest/download"

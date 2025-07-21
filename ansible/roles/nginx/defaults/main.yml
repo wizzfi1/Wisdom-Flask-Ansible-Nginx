@@ -1,3 +1,4 @@
 ---
 app_port: 5000
-grafana_domain: "{{ wizfi-devops.duckdns.org }}"
+grafana_domain: "{{ wizfi-grafana.duckdns.org }}"
+flask_domain: "{{ wizfi-devops.duckdns.org }}"

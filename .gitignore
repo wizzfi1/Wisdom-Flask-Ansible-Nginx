@@ -7,4 +7,5 @@
 .terraform/
 *.tfstate*
 secrets/
+.env
 .ssh/
